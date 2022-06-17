@@ -40,7 +40,9 @@ contract('Sandwiches', async accounts => {
     //approve
     console.log("pool address: ", pool.address);
     await chi.approve(pool.address, web3.utils.toWei('210000', 'ether'));
+
     // make sure your ingredients and equipments contains all child types
+    // other way, you can remove limit of types while test at local or testnet in contracts/core/SandwichesERC1155.sol at line 204 and 233 for testing merge heroes.
     const { tx } = await sandwichesContract.merge(web3.utils.toWei('210000', 'ether'), [1,2,3,4], [1,2,3], 1, '', '');
 
     await expectEvent.inTransaction(tx, sandwichesContract, 'SandwichesCreated', { id: '1'});
