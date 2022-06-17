@@ -99,7 +99,8 @@ contract BellyBoxCore is Initializable, AccessControlUpgradeable, IBellyBoxCore{
     ) public override {
         require(bellyBoxes[bellyBoxType].price == cswAmount, "CSW value sent is not correct");
         require(bellyBoxes[bellyBoxType].opened < bellyBoxes[bellyBoxType].supply, "The belly box exceeds the upper limit");
-        SafeERC20Upgradeable.safeTransferFrom(cswToken, _msgSender(), address(this), cswAmount);
+        require(!AddressUpgradeable.isContract(_msgSender()), "Only permit personal address");
+        SafeERC20Upgradeable.safeTransferFrom(cswToken, _msgSender(), 0x000000000000000000000000000000000000dEaD , cswAmount);
         _openBox(bellyBoxType, address(cswToken), cswAmount);
     }
 
@@ -118,6 +119,7 @@ contract BellyBoxCore is Initializable, AccessControlUpgradeable, IBellyBoxCore{
     ) public override {
         require(bellyBoxes[bellyBoxType].busdPrice == busdAmount, "BUSD value sent is not correct");
         require(bellyBoxes[bellyBoxType].opened < bellyBoxes[bellyBoxType].supply, "The belly box exceeds the upper limit");
+        require(!AddressUpgradeable.isContract(_msgSender()), "Only permit personal address");
         SafeERC20Upgradeable.safeTransferFrom(busdToken, _msgSender(), address(this), busdAmount);
         _openBox(bellyBoxType, address(busdToken), busdAmount);
     }
@@ -214,9 +216,9 @@ contract BellyBoxCore is Initializable, AccessControlUpgradeable, IBellyBoxCore{
         describe = box.describe;
     } 
 
-    function withdrawBUSD(address to) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        uint256 amount = busdToken.balanceOf(address(this));
-        SafeERC20Upgradeable.safeTransfer(busdToken, to, amount);
+    function withrawERC20(address _token, address to) external onlyRole(DEFAULT_ADMIN_ROLE){
+        IERC20Upgradeable token = IERC20Upgradeable(_token);
+        SafeERC20Upgradeable.safeTransfer(token, to, token.balanceOf(address(this)));
     }
     
 }

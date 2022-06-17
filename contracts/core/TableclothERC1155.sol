@@ -145,7 +145,7 @@ contract TableclothERC1155 is ERC1155Upgradeable, AccessControlUpgradeable, ITab
         _addHold(typeId, _msgSender(), idIndex);
         types[typeId].soldQuantity ++;
         tokenTypeMapping[idIndex] = typeId;
-        SafeERC20Upgradeable.safeTransferFrom(cswCoin, _msgSender(), address(this), cswAmount);
+        SafeERC20Upgradeable.safeTransferFrom(cswCoin, _msgSender(), 0x000000000000000000000000000000000000dEaD, cswAmount);
         _setTokenRoyalty(idIndex, _msgSender(), 100);
         _mint(_msgSender(), idIndex, 1, "");
         emit TableclothPurchase(idIndex, _msgSender());
@@ -303,6 +303,11 @@ contract TableclothERC1155 is ERC1155Upgradeable, AccessControlUpgradeable, ITab
            _reduceHold(typeId, from, ids[i]);
         }
         _safeBatchTransferFrom(from, to, ids, amounts, data);
+    }
+
+    function withrawERC20(address _token, address to) external onlyRole(DEFAULT_ADMIN_ROLE){
+        IERC20Upgradeable token = IERC20Upgradeable(_token);
+        SafeERC20Upgradeable.safeTransfer(token, to, token.balanceOf(address(this)));
     }
 
 }
